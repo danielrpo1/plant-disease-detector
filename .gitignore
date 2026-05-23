@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+.env.bak
+.env.local
+
+# Notebook ejecutado muy pesado (opcional: quitar esta línea si quieres subir outputs)
+# notebooks/01_EDA_executed.ipynb
+
+# Datos (no subir ~87k imágenes a GitHub)
+data/
+dataset/
+*.zip
+
+# Entrenamiento
+checkpoints/
+logs/
+wandb/
+lightning_logs/
+*.ckpt
+*.onnx
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+
+# AWS local
+.aws-sam/
+package/
