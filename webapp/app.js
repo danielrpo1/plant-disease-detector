@@ -122,11 +122,24 @@ function renderResults(data) {
   results.classList.remove("hidden");
   const top = data.predictions[0];
   const pct = (top.confidence * 100).toFixed(1);
-  let html = `<h2>${top.display_name}</h2><p class="confidence">Confianza: ${pct}%</p><h3>Top 3</h3><ul>`;
+  const tip = data.treatment_recommendation || top.treatment_recommendation || "";
+
+  let html = `<h2>${top.display_name}</h2><p class="confidence">Confianza: ${pct}%</p>`;
+
+  if (tip) {
+    html += `<div class="treatment"><h3>Recomendación de manejo (bajo costo)</h3><p>${tip}</p></div>`;
+  }
+
+  html += "<h3>Otras posibilidades</h3><ul>";
   for (const p of data.predictions) {
     html += `<li>${p.display_name} — ${(p.confidence * 100).toFixed(1)}%</li>`;
   }
   html += "</ul>";
+
+  if (data.disclaimer) {
+    html += `<p class="disclaimer">${data.disclaimer}</p>`;
+  }
+
   results.innerHTML = html;
 }
 

@@ -5,9 +5,18 @@ const PlantOnnx = (() => {
   let session = null;
   let idxToClass = {};
   let displayEs = {};
+  let treatmentTips = {};
+  let disclaimer = "";
 
   function displayName(cls) {
     return displayEs[cls] || cls.replace(/___/g, " - ").replace(/_/g, " ");
+  }
+
+  function treatmentFor(cls) {
+    return (
+      treatmentTips[cls] ||
+      "Retire tejido muy dañado, mejore ventilación y consulte extensión agrícola local."
+    );
   }
 
   async function load(modelUrl, metaUrl) {
@@ -15,11 +24,14 @@ const PlantOnnx = (() => {
       ort.env.wasm.wasmPaths =
         "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.0/dist/";
     }
-    const [meta, labels] = await Promise.all([
+    const [meta, labels, treatments] = await Promise.all([
       fetch(metaUrl).then((r) => r.json()),
       fetch("models/labels_display.json").then((r) => r.json()).catch(() => ({})),
+      fetch("models/treatments.json").then((r) => r.json()).catch(() => ({ tips: {} })),
     ]);
     displayEs = labels;
+    treatmentTips = treatments.tips || {};
+    disclaimer = treatments.disclaimer || "";
     idxToClass = meta.idx_to_class;
     session = await ort.InferenceSession.create(modelUrl, { executionProviders: ["wasm"] });
   }
@@ -65,9 +77,20 @@ const PlantOnnx = (() => {
       .slice(0, 3)
       .map(({ i, p }) => {
         const cls = idxToClass[String(i)] ?? idxToClass[i];
-        return { class: cls, confidence: Math.round(p * 1e4) / 1e4, display_name: displayName(cls) };
+        return {
+          class: cls,
+          confidence: Math.round(p * 1e4) / 1e4,
+          display_name: displayName(cls),
+          treatment_recommendation: treatmentFor(cls),
+        };
       });
-    return { predictions: top, top_prediction: top[0].class, confidence: top[0].confidence };
+    return {
+      predictions: top,
+      top_prediction: top[0].class,
+      confidence: top[0].confidence,
+      treatment_recommendation: top[0].treatment_recommendation,
+      disclaimer,
+    };
   }
 
   return { load, predict };

@@ -47,3 +47,19 @@ h1 { margin-top: 0; font-size: 1.5rem; }
 .confidence { font-size: 1.1rem; }
 .results ul { padding-left: 1.2rem; }
 .error { color: #b00020; margin-top: 1rem; }
+.treatment {
+  margin: 1rem 0;
+  padding: 0.85rem 1rem;
+  background: #f0f7f2;
+  border-left: 4px solid #2d6a4f;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+.treatment h3 { margin: 0 0 0.5rem; font-size: 1rem; color: #1b4332; }
+.disclaimer {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: #666;
+  line-height: 1.35;
+}

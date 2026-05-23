@@ -9,5 +9,6 @@ COPY model.onnx ${LAMBDA_TASK_ROOT}/model.onnx
 COPY model.meta.json ${LAMBDA_TASK_ROOT}/model.meta.json
 COPY handler.py ${LAMBDA_TASK_ROOT}/handler.py
 COPY labels.py ${LAMBDA_TASK_ROOT}/labels.py
+COPY treatments.py ${LAMBDA_TASK_ROOT}/treatments.py
 
 CMD ["handler.lambda_handler"]

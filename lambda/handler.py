@@ -68,6 +68,24 @@ def _display(class_id: str) -> str:
     return _DISPLAY_ES.get(class_id, class_id.replace("___", " - ").replace("_", " "))
 
 
+def _treatment(class_id: str) -> str:
+    try:
+        from treatments import treatment_tip, DISCLAIMER_ES  # type: ignore
+
+        return treatment_tip(class_id)
+    except ImportError:
+        return "Consulte extensión agrícola local para manejo de la enfermedad."
+
+
+def _disclaimer() -> str:
+    try:
+        from treatments import DISCLAIMER_ES  # type: ignore
+
+        return DISCLAIMER_ES
+    except ImportError:
+        return ""
+
+
 def predict(image_bytes: bytes, top_k: int = 3) -> dict:
     _load_meta()
     session = _get_session()
@@ -85,7 +103,12 @@ def predict(image_bytes: bytes, top_k: int = 3) -> dict:
         cls = _IDX_TO_CLASS[int(i)]
         conf = float(probs[i])
         predictions.append(
-            {"class": cls, "confidence": round(conf, 4), "display_name": _display(cls)}
+            {
+                "class": cls,
+                "confidence": round(conf, 4),
+                "display_name": _display(cls),
+                "treatment_recommendation": _treatment(cls),
+            }
         )
 
     best = predictions[0]
@@ -93,6 +116,8 @@ def predict(image_bytes: bytes, top_k: int = 3) -> dict:
         "predictions": predictions,
         "top_prediction": best["class"],
         "confidence": best["confidence"],
+        "treatment_recommendation": best["treatment_recommendation"],
+        "disclaimer": _disclaimer(),
     }
 
 
