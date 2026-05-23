@@ -27,11 +27,14 @@
 | Integrante | GitHub |
 |------------|--------|
 | Daniel Restrepo | [@danielrpo1](https://github.com/danielrpo1) |
+| Obeney Londoño | [@Obeney](https://github.com/Obeney) |
 | E-DOR28 | [@E-DOR28](https://github.com/E-DOR28) |
 | Eider Díaz | [@EiderDiaz-10](https://github.com/EiderDiaz-10) |
 | Valentina Delgado | [@ValenDelgado](https://github.com/ValenDelgado) |
 
 Repositorio: **https://github.com/danielrpo1/plant-disease-detector**
+
+**Proyecto paralelo (AWS + ResNet-50):** repositorio separado `plant-disease-detector-aws` — misma tarea, inferencia en EC2, S3 y PostgreSQL.
 
 ---
 
