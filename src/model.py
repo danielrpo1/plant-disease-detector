@@ -69,6 +69,9 @@ class PlantDiseaseModule(pl.LightningModule):
 
     def _shared_step(self, batch, stage: str) -> torch.Tensor:
         images, labels = batch
+        # Asegura mismo dispositivo (fix CPU/GPU en Lightning Studio)
+        images = images.to(self.device)
+        labels = labels.to(self.device)
         logits = self(images)
         loss = F.cross_entropy(logits, labels)
 

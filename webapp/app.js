@@ -1,7 +1,11 @@
 const apiHint = document.getElementById("apiHint");
-if (!window.API_URL || window.API_URL.includes("PASTE_")) {
-  apiHint.textContent =
-    "Vista previa: conecta la API en webapp/config.js después del entrenamiento.";
+const useApi = window.API_URL && !window.API_URL.includes("PASTE_");
+const useOnnx = !useApi;
+
+let onnxReady = false;
+
+if (useOnnx) {
+  apiHint.textContent = "Cargando modelo en el navegador…";
   apiHint.classList.remove("hidden");
 }
 
@@ -13,6 +17,20 @@ const loading = document.getElementById("loading");
 const errorEl = document.getElementById("error");
 
 let selectedFile = null;
+
+async function initOnnx() {
+  if (!useOnnx) return;
+  try {
+    await PlantOnnx.load(window.ONNX_MODEL_URL, window.ONNX_META_URL);
+    onnxReady = true;
+    apiHint.textContent = "Modo demo: inferencia ONNX en tu navegador (sin servidor).";
+  } catch (e) {
+    apiHint.textContent = "Modelo aún no disponible. Entrenamiento en curso…";
+    console.error(e);
+  }
+}
+
+initOnnx();
 
 fileInput.addEventListener("change", () => {
   selectedFile = fileInput.files[0] || null;
@@ -37,16 +55,22 @@ fileInput.addEventListener("change", () => {
 btnPredict.addEventListener("click", async () => {
   if (!selectedFile) return;
 
-  if (!window.API_URL || window.API_URL.includes("PASTE_")) {
-    showError("Configura window.API_URL en webapp/config.js");
-    return;
+  if (useApi) {
+    await predictViaApi();
+  } else {
+    if (!onnxReady) {
+      showError("El modelo ONNX aún no está en GitHub Pages. Vuelve en unos minutos.");
+      return;
+    }
+    await predictViaOnnx();
   }
+});
 
+async function predictViaApi() {
   loading.classList.remove("hidden");
   results.classList.add("hidden");
   errorEl.classList.add("hidden");
   btnPredict.disabled = true;
-
   try {
     const base64 = await fileToBase64(selectedFile);
     const res = await fetch(window.API_URL, {
@@ -54,10 +78,8 @@ btnPredict.addEventListener("click", async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ image: base64 }),
     });
-
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || res.statusText);
-
     renderResults(data);
   } catch (err) {
     showError(err.message);
@@ -65,16 +87,30 @@ btnPredict.addEventListener("click", async () => {
     loading.classList.add("hidden");
     btnPredict.disabled = false;
   }
-});
+}
+
+async function predictViaOnnx() {
+  loading.classList.remove("hidden");
+  loading.textContent = "Analizando (ONNX local)…";
+  results.classList.add("hidden");
+  errorEl.classList.add("hidden");
+  btnPredict.disabled = true;
+  try {
+    const data = await PlantOnnx.predict(selectedFile);
+    renderResults(data);
+  } catch (err) {
+    showError(err.message);
+  } finally {
+    loading.classList.add("hidden");
+    loading.textContent = "Analizando…";
+    btnPredict.disabled = false;
+  }
+}
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result;
-      const b64 = dataUrl.split(",")[1];
-      resolve(b64);
-    };
+    reader.onload = () => resolve(reader.result.split(",")[1]);
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
@@ -84,9 +120,7 @@ function renderResults(data) {
   results.classList.remove("hidden");
   const top = data.predictions[0];
   const pct = (top.confidence * 100).toFixed(1);
-
-  let html = `<h2>${top.display_name}</h2><p class="confidence">Confianza: ${pct}%</p>`;
-  html += "<h3>Top 3</h3><ul>";
+  let html = `<h2>${top.display_name}</h2><p class="confidence">Confianza: ${pct}%</p><h3>Top 3</h3><ul>`;
   for (const p of data.predictions) {
     html += `<li>${p.display_name} — ${(p.confidence * 100).toFixed(1)}%</li>`;
   }

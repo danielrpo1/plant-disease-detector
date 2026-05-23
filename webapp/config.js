@@ -1,3 +1,5 @@
-// Pega aquí la URL de API Gateway después del deploy
-// Ejemplo: https://abc123.execute-api.us-east-1.amazonaws.com/prod/predict
-window.API_URL = "PASTE_API_GATEWAY_URL_HERE";
+// API remota (Lambda). Vacío = inferencia ONNX en el navegador.
+window.API_URL = "";
+
+window.ONNX_MODEL_URL = "models/model.onnx";
+window.ONNX_META_URL = "models/model.meta.json";

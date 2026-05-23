@@ -23,6 +23,7 @@ wandb/
 lightning_logs/
 *.ckpt
 *.onnx
+!webapp/models/*.onnx
 
 # Jupyter
 .ipynb_checkpoints/

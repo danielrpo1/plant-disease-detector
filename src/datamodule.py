@@ -146,12 +146,14 @@ class PlantDiseaseDataModule(pl.LightningDataModule):
 
     def train_dataloader(self) -> DataLoader:
         assert self.train_dataset is not None
+        # num_workers=0 evita tensores en CPU con GPU en algunos entornos (Lightning Studio)
+        nw = 0 if self.num_workers > 0 else 0
         return DataLoader(
             self.train_dataset,
             batch_size=self.batch_size,
             shuffle=True,
-            num_workers=self.num_workers,
-            pin_memory=True,
+            num_workers=nw,
+            pin_memory=False,
         )
 
     def val_dataloader(self) -> DataLoader:
@@ -160,8 +162,8 @@ class PlantDiseaseDataModule(pl.LightningDataModule):
             self.val_dataset,
             batch_size=self.batch_size,
             shuffle=False,
-            num_workers=self.num_workers,
-            pin_memory=True,
+            num_workers=0,
+            pin_memory=False,
         )
 
     def save_class_mapping(self, path: str | Path) -> None:

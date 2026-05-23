@@ -109,12 +109,15 @@ def main() -> None:
     else:
         logger = WandbLogger(project=args.wandb_project, log_model=False)
 
-    # --- Trainer Lightning (mixed precision acelera en GPU) ---
+    # --- Trainer Lightning ---
+    import torch
+
+    use_gpu = torch.cuda.is_available()
     trainer = pl.Trainer(
         max_epochs=epochs,
-        accelerator="auto",  # gpu si existe, si no cpu
+        accelerator="gpu" if use_gpu else "cpu",
         devices=1,
-        precision="16-mixed",
+        precision=32,  # 16-mixed puede fallar con backbone congelado en algunos drivers
         callbacks=[checkpoint_cb, early_stop],
         logger=logger,
         log_every_n_steps=10,

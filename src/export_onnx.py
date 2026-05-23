@@ -34,9 +34,13 @@ class ExportableModel(nn.Module):
 
 
 def load_from_checkpoint(ckpt_path: str, num_classes: int) -> ExportableModel:
-    """Carga pesos desde .ckpt de Lightning."""
-    lit = PlantDiseaseModule.load_from_checkpoint(ckpt_path, num_classes=num_classes)
-    return ExportableModel(lit.backbone, lit.head)
+    """Carga pesos desde .ckpt de Lightning (siempre en CPU para ONNX)."""
+    lit = PlantDiseaseModule.load_from_checkpoint(
+        ckpt_path, num_classes=num_classes, map_location="cpu"
+    )
+    exportable = ExportableModel(lit.backbone, lit.head)
+    exportable.cpu().eval()
+    return exportable
 
 
 def parse_args() -> argparse.Namespace:
