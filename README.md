@@ -182,9 +182,9 @@ En `webapp/config.js`: `window.API_URL = "http://127.0.0.1:8000/predict"`.
 | Paso | Estado | Entregable |
 |------|--------|------------|
 | 1. EDA | ✅ | [`01_EDA_executed.ipynb`](notebooks/01_EDA_executed.ipynb) |
-| 2. Entrenar EfficientNet | ⏳ | `checkpoints/*.ckpt` + curvas W&B |
-| 3. Export ONNX | ⏳ | `artifacts/model.onnx` |
-| 4. API (Lambda o local) | ⏳ | URL en `webapp/config.js` |
+| 2. Entrenar EfficientNet | ✅ | val_acc ≈ **96.3%** (`--fast`, 50 img/clase) |
+| 3. Export ONNX | ✅ | `webapp/models/model.onnx` (16 MB) |
+| 4. Inferencia en web | ✅ | ONNX en el navegador (sin AWS) |
 | 5. GitHub Pages | ✅ | [danielrpo1.github.io/plant-disease-detector](https://danielrpo1.github.io/plant-disease-detector/) |
 | 6. Informe / slides | ⏳ | Pipeline end-to-end |
 
