@@ -11,6 +11,10 @@ const PlantOnnx = (() => {
   }
 
   async function load(modelUrl, metaUrl) {
+    if (typeof ort !== "undefined") {
+      ort.env.wasm.wasmPaths =
+        "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.0/dist/";
+    }
     const [meta, labels] = await Promise.all([
       fetch(metaUrl).then((r) => r.json()),
       fetch("models/labels_display.json").then((r) => r.json()).catch(() => ({})),

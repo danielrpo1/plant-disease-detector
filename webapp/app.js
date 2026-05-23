@@ -59,7 +59,9 @@ btnPredict.addEventListener("click", async () => {
     await predictViaApi();
   } else {
     if (!onnxReady) {
-      showError("El modelo ONNX aún no está en GitHub Pages. Vuelve en unos minutos.");
+      showError(
+        "El modelo no terminó de cargar. Recarga la página (Ctrl+Shift+R o Cmd+Shift+R) y espera unos segundos."
+      );
       return;
     }
     await predictViaOnnx();
