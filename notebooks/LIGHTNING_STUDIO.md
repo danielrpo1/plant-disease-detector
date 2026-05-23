@@ -45,6 +45,10 @@ find . -type d -name train 2>/dev/null | head -3
 
 ## 4. Entrenar (modo 1 día)
 
+**Recomendado para el informe:** abre y ejecuta `notebooks/02_entrenamiento.ipynb` (tabla y gráficas de épocas, loss y accuracy).
+
+Alternativa por terminal:
+
 ```bash
 export DATA_DIR="/ruta/que/contenga/train-y-valid"
 python -m src.train --data_dir "$DATA_DIR" --fast --wandb_off

@@ -18,8 +18,9 @@ if env_file.exists():
             k, v = line.split("=", 1)
             os.environ.setdefault(k.strip(), v.strip())
 
-USER = "ddrestrepo"
-TEAMSPACE = "neural-network-development-project"
+USER = os.environ.get("LIGHTNING_USER", "ddrestrepo")
+TEAMSPACE = os.environ.get("LIGHTNING_TEAMSPACE", "neural-network-development-project")
+STUDIO_NAME = os.environ.get("LIGHTNING_STUDIO", "cognitive-bronze-moof")
 REMOTE_DIR = "plant-disease-detector"
 SKIP = {".env", ".env.bak", ".git", "__pycache__", ".DS_Store", "checkpoints", "wandb", "artifacts"}
 
@@ -38,22 +39,8 @@ def main() -> None:
     from lightning_sdk.teamspace import Teamspace
 
     print(f"Conectando: user={USER}, teamspace={TEAMSPACE}")
-    ts = Teamspace(name=TEAMSPACE, user=USER)
-    studios = ts.studios
-    if not studios:
-        print("No hay studios. Creando uno...")
-        studio = Studio(name="plant-disease-eafit", teamspace=TEAMSPACE, user=USER)
-    else:
-        # Usar el primero encendido o el primero de la lista
-        studio = None
-        for s in studios:
-            print(f"  Studio: {s.name} — status={s.status}")
-            if str(s.status).lower() in ("running", "on", "ready"):
-                studio = s
-                break
-        if studio is None:
-            studio = studios[0]
-        print(f"Usando studio: {studio.name}")
+    studio = Studio(name=STUDIO_NAME, teamspace=TEAMSPACE, user=USER, create_ok=False)
+    print(f"Usando studio: {STUDIO_NAME} (status={studio.status})")
 
     # Subir archivos uno a uno (evita .env)
     files = [p for p in ROOT.rglob("*") if p.is_file() and should_upload(p.relative_to(ROOT))]

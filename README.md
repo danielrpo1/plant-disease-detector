@@ -17,7 +17,8 @@
   <a href="#limitaciones-de-uso">Limitaciones</a> ·
   <a href="#arquitectura">Arquitectura</a> ·
   <a href="#entrenamiento">Entrenar</a> ·
-  <a href="notebooks/01_EDA_executed.ipynb">EDA</a>
+  <a href="notebooks/01_EDA_executed.ipynb">EDA</a> ·
+  <a href="notebooks/02_entrenamiento.ipynb">Entrenamiento</a>
 </p>
 
 ---
@@ -121,7 +122,10 @@ flowchart LR
 | Valid | 10,948 |
 | Desbalance max/min | ~36× |
 
-Notebook con figuras: [`notebooks/01_EDA_executed.ipynb`](notebooks/01_EDA_executed.ipynb).
+| Notebook | Contenido |
+|----------|-----------|
+| [`01_EDA_executed.ipynb`](notebooks/01_EDA_executed.ipynb) | Exploración del dataset |
+| [`02_entrenamiento.ipynb`](notebooks/02_entrenamiento.ipynb) | **Entrenamiento EfficientNet** — épocas, error y accuracy (tabla + gráficas) |
 
 ---
 
@@ -278,6 +282,7 @@ Docker en `lambda/`, modelo en S3, API Gateway. Ver [`infra/deploy.sh`](infra/de
 | Componente | Estado |
 |------------|--------|
 | EDA | ✅ [`01_EDA_executed.ipynb`](notebooks/01_EDA_executed.ipynb) |
+| Entrenamiento (métricas por época) | ✅ [`02_entrenamiento.ipynb`](notebooks/02_entrenamiento.ipynb) |
 | Entrenamiento EfficientNet-B0 | ✅ val_acc ≈ 96,3 % (`--fast`) |
 | Export ONNX + web | ✅ [Docs](https://danielrpo1.github.io/plant-disease-detector/) · [Demo](https://danielrpo1.github.io/plant-disease-detector/app/) |
 | Tratamientos y avisos OOD en UI | ✅ |
