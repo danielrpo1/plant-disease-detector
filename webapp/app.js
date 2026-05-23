@@ -1,6 +1,13 @@
+/** Por debajo de este umbral mostramos aviso de resultado poco confiable. */
+const CONFIDENCE_LOW = 0.6;
+
 const apiHint = document.getElementById("apiHint");
 const useApi = window.API_URL && !window.API_URL.includes("PASTE_");
 const useOnnx = !useApi;
+
+function cropFromClass(classId) {
+  return (classId || "").split("___")[0];
+}
 
 let onnxReady = false;
 
@@ -118,16 +125,53 @@ function fileToBase64(file) {
   });
 }
 
+function buildWarnings(data) {
+  const top = data.predictions[0];
+  const warnings = [];
+  const crops = new Set(data.predictions.map((p) => cropFromClass(p.class)));
+
+  if (top.confidence < CONFIDENCE_LOW) {
+    warnings.push(
+      "Confianza baja: la hoja podría no ser de un cultivo del dataset. No tomes el diagnóstico como definitivo."
+    );
+  }
+  if (crops.size >= 2) {
+    warnings.push(
+      "Las tres opciones son de plantas distintas: es muy probable que la foto no corresponda al entrenamiento (otra especie, fondo confuso o imagen poco clara)."
+    );
+  }
+  if (top.confidence >= CONFIDENCE_LOW && crops.size === 1) {
+    return warnings;
+  }
+  warnings.push(
+    "Usa solo hojas de los 14 cultivos listados arriba. Para otras plantas el modelo inventa la opción más parecida entre 38 clases."
+  );
+  return [...new Set(warnings)];
+}
+
 function renderResults(data) {
   results.classList.remove("hidden");
   const top = data.predictions[0];
   const pct = (top.confidence * 100).toFixed(1);
   const tip = data.treatment_recommendation || top.treatment_recommendation || "";
+  const warnings = buildWarnings(data);
+  const crops = new Set(data.predictions.map((p) => cropFromClass(p.class)));
+  const unreliable = top.confidence < CONFIDENCE_LOW || crops.size >= 2;
 
   let html = `<h2>${top.display_name}</h2><p class="confidence">Confianza: ${pct}%</p>`;
 
-  if (tip) {
+  if (warnings.length) {
+    html += '<div class="warn-box" role="alert"><h3>Aviso</h3><ul>';
+    for (const w of warnings) {
+      html += `<li>${w}</li>`;
+    }
+    html += "</ul></div>";
+  }
+
+  if (tip && !unreliable) {
     html += `<div class="treatment"><h3>Recomendación de manejo (bajo costo)</h3><p>${tip}</p></div>`;
+  } else if (tip && unreliable) {
+    html += `<p class="treatment-muted">Recomendación de manejo omitida porque el resultado parece poco confiable.</p>`;
   }
 
   html += "<h3>Otras posibilidades</h3><ul>";

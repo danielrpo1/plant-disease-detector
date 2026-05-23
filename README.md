@@ -9,12 +9,12 @@
   <img src="https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white" alt="PyTorch"/>
   <img src="https://img.shields.io/badge/Lightning-792EE5?style=for-the-badge&logo=lightning&logoColor=white" alt="Lightning"/>
   <img src="https://img.shields.io/badge/ONNX-005CED?style=for-the-badge&logo=onnx&logoColor=white" alt="ONNX"/>
-  <img src="https://img.shields.io/badge/AWS_Lambda-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white" alt="AWS"/>
 </p>
 
 <p align="center">
-  <a href="https://danielrpo1.github.io/plant-disease-detector/">Web demo</a> ·
-  <a href="#roadmap">Qué sigue</a> ·
+  <a href="https://danielrpo1.github.io/plant-disease-detector/"><strong>Web demo</strong></a> ·
+  <a href="#modelo-entrenado-y-resultados">Modelo y resultados</a> ·
+  <a href="#limitaciones-de-uso">Limitaciones</a> ·
   <a href="#arquitectura">Arquitectura</a> ·
   <a href="#entrenamiento">Entrenar</a> ·
   <a href="notebooks/01_EDA_executed.ipynb">EDA</a>
@@ -22,7 +22,7 @@
 
 ---
 
-## Equipo (EAFIT — Proyecto integrador)
+## Equipo
 
 | Integrante | GitHub |
 |------------|--------|
@@ -31,194 +31,185 @@
 | Eider Díaz | [@EiderDiaz-10](https://github.com/EiderDiaz-10) |
 | Valentina Delgado | [@ValenDelgado](https://github.com/ValenDelgado) |
 
-Repositorio del equipo: **https://github.com/danielrpo1/plant-disease-detector**
-
----
-
-## El proceso explicado (con metáforas)
-
-Imagina un **consultorio para plantas**:
-
-| Metáfora | Qué es en la vida real | Dónde vive |
-|----------|------------------------|------------|
-| **Biblioteca de casos** (fotos de hojas enfermas y sanas) | Dataset (~38 enfermedades × miles de fotos) | Kaggle / Hugging Face — **no** en Lightning ni en GitHub (son demasiadas imágenes) |
-| **Gimnasio / universidad** donde el médico **estudia** | Entrenamiento con GPU (épocas, loss, accuracy) | **Lightning AI Studio** — un PC en la nube con GPU que alquilas por horas |
-| **Apuntes y código del curso** | Scripts Python, notebooks, README | **GitHub** — como un Google Drive público para programadores |
-| **El cerebro entrenado** (conocimiento ya aprendido) | Archivo del modelo: primero `.ckpt`, luego `.onnx` | Tras entrenar: en Lightning un rato → luego copiado a **GitHub** (`webapp/models/`) |
-| **Consultorio en la calle** (donde llega el paciente) | Página web donde subes una foto | **GitHub Pages** — hosting gratis de la carpeta `webapp/` |
-| **Recepcionista en la nube** (opcional, brief AWS) | API Lambda que recibe la foto y responde JSON | **AWS** — solo si montan servidor; hoy la demo usa el cerebro **en el navegador** |
-
-### ¿Qué vive en Lightning y qué no?
-
-**En Lightning vive temporalmente:**
-
-- El dataset **mientras entrenas** (carpeta `data/plantvillage/` en el disco del Studio).
-- El **entrenamiento en vivo** (GPU calculando pesos).
-- Los **checkpoints** `.ckpt` antes de exportar.
-
-**No vive permanentemente en Lightning:**
-
-- La web pública (cuando apagas el Studio, la web sigue en GitHub Pages).
-- El “cerebro” final para usuarios (se **exporta** y se lleva a GitHub).
-
-Lightning es el **gimnasio**, no el **hospital definitivo**.
-
-### ¿Dónde vive el cerebro?
-
-```
-1. Durante el estudio  →  Lightning (archivo .ckpt en el Studio)
-2. Para viajar ligero  →  se convierte a ONNX (~16 MB) — “cerebro comprimido”
-3. Para la demo web    →  GitHub (webapp/models/model.onnx)
-4. En tu celular/PC    →  el navegador descarga ese ONNX y piensa localmente
-5. (Opcional AWS)      →  S3 + Lambda tendrían otra copia del mismo ONNX
-```
-
-El **cerebro no es Lightning**. Lightning solo **lo creó**.  
-El cerebro **publicado** está en **GitHub** (y se ejecuta en el **navegador** del usuario o, si lo configuran, en **AWS Lambda**).
-
-### ¿Para qué usamos GitHub?
-
-GitHub cumple **cuatro roles** distintos:
-
-1. **Caja fuerte del código** — `src/`, notebooks, scripts: todo el equipo clona, edita y hace `git push`.
-2. **Memoria del proyecto** — este README, EDA con figuras, instrucciones (`DESPUES_DEL_EDA.md`).
-3. **Museo del modelo** — `model.onnx` + nombres de las 38 clases para que la web funcione sin depender de Lightning.
-4. **Escaparate (GitHub Pages)** — la URL pública del consultorio: [danielrpo1.github.io/plant-disease-detector](https://danielrpo1.github.io/plant-disease-detector/)
-
-Sin GitHub tendrías código solo en tu laptop y el profesor no podría ver ni repetir el experimento.
-
-### Flujo completo en una frase
-
-> Fotos en internet → se **entrenan** en Lightning → el cerebro se **guarda** en GitHub → la **web** en Pages usa ese cerebro para diagnosticar hojas.
-
-```mermaid
-flowchart TB
-  subgraph datos [Datos - fuera del repo]
-    K[Kaggle / Hugging Face]
-  end
-  subgraph lightning [Lightning Studio - gimnasio GPU]
-    T[Entrenar EfficientNet]
-    C[checkpoint .ckpt]
-    O[export ONNX]
-  end
-  subgraph github [GitHub - código + cerebro + vitrina]
-    R[Código y README]
-    M[model.onnx]
-    P[GitHub Pages - webapp]
-  end
-  subgraph usuario [Usuario final]
-    U[Sube foto de hoja]
-    N[Navegador ejecuta ONNX]
-  end
-  K --> T --> C --> O --> M
-  O --> R
-  M --> P
-  P --> U --> N
-```
-
-### Demo actual vs. diseño con AWS (brief)
-
-| Modo | Cómo funciona |
-|------|----------------|
-| **Hoy (listo)** | Pages descarga el ONNX desde GitHub; el diagnóstico ocurre en **tu navegador**. |
-| **Brief completo (opcional)** | Pages envía la foto a **API Gateway → Lambda**; el cerebro corre en AWS y devuelve JSON. |
-
-Ambos usan el **mismo cerebro** (mismo archivo ONNX); solo cambia **dónde piensa** (navegador vs. nube AWS).
+Repositorio: **https://github.com/danielrpo1/plant-disease-detector**
 
 ---
 
 ## El problema
 
-Los agricultores y agrónomos necesitan identificar **enfermedades en cultivos** a partir de fotos de hojas. Este proyecto entrena un clasificador de **38 clases** (planta + enfermedad o “sano”) y lo expone mediante una **API ligera** y una **web** donde se sube una imagen y se obtiene el diagnóstico con confianza.
+Identificar **enfermedades en cultivos** a partir de fotos de hojas. El sistema clasifica entre **38 clases** (cultivo + enfermedad o “sano”) y expone el resultado en una **web** con diagnóstico, confianza, top-3 y recomendaciones de manejo orientativas.
 
 ## Demo
 
-| EDA — distribución de clases | Muestras del dataset |
+**URL:** [danielrpo1.github.io/plant-disease-detector](https://danielrpo1.github.io/plant-disease-detector/)
+
+| Distribución de clases (EDA) | Muestras del dataset |
 |:---:|:---:|
 | ![Distribución](notebooks/eda_outputs/01_class_distribution_top15.png) | ![Muestras](notebooks/eda_outputs/03_sample_grid.png) |
 
-**Flujo de usuario:** subir foto → modelo ONNX (en el navegador o en AWS) → top-3 predicciones en español.
+**Flujo:** subir foto → inferencia **ONNX en el navegador** → diagnóstico en español + avisos si la confianza es baja o la hoja no parece del dataset.
 
-```json
-{
-  "predictions": [
-    {"class": "Tomato___Late_blight", "confidence": 0.92, "display_name": "Tomate - Tizón tardío"}
-  ],
-  "top_prediction": "Tomato___Late_blight",
-  "confidence": 0.92
-}
+Ver [modelo entrenado](#modelo-entrenado-y-resultados) y [limitaciones](#limitaciones-de-uso).
+
+---
+
+## Proceso (pipeline)
+
+```mermaid
+flowchart LR
+  HF[Kaggle / Hugging Face] --> TR[Entrenamiento Lightning GPU]
+  TR --> CKPT[Checkpoint .ckpt]
+  CKPT --> ONNX[Export ONNX]
+  ONNX --> GH[GitHub webapp/models]
+  GH --> WEB[GitHub Pages]
+  WEB --> USR[Usuario sube foto]
+  USR --> INF[ONNX Runtime WASM]
 ```
+
+| Etapa | Dónde | Qué ocurre |
+|-------|--------|------------|
+| Datos | Kaggle o Hugging Face | ~87k imágenes PlantVillage, 38 clases (`train/` + `valid/`) |
+| Entrenamiento | Lightning AI Studio (GPU) | EfficientNet-B0, checkpoints, métricas |
+| Artefacto | Repo `webapp/models/` | `model.onnx` (~16 MB) + metadatos de clases |
+| Producción | GitHub Pages | La demo corre el modelo **en el cliente**; no requiere AWS |
+| Opcional | `lambda/` + API Gateway | Misma red en ONNX vía servidor (ver [Despliegue](#despliegue)) |
+
+---
 
 ## Arquitectura
 
 ```mermaid
 flowchart LR
   subgraph train [Entrenamiento]
-    A[Imágenes train/valid] --> B[Lightning DataModule]
+    A[train / valid] --> B[DataModule]
     B --> C[EfficientNet-B0]
-    C --> D[Checkpoint .ckpt]
+    C --> D[.ckpt]
     D --> E[ONNX]
   end
   subgraph serve [Producción actual]
     F[GitHub Pages] --> N[ONNX en navegador]
-    N --> I[JSON diagnóstico]
-  end
-  subgraph serve_aws [Producción AWS - opcional]
-    F2[GitHub Pages] --> G[API Gateway]
-    G --> H[Lambda + ONNX]
-    H --> I2[JSON]
+    N --> J[Diagnóstico JSON]
   end
   E --> N
-  E -.-> H
 ```
 
-| Capa | Tecnología | Por qué |
-|------|------------|---------|
-| Entrenamiento | PyTorch Lightning 2.x | Loop reproducible, checkpoints, mixed precision |
-| Modelo | EfficientNet-B0 (ImageNet) | Mejor que VGG para deploy; transfer learning |
-| Logging | W&B / TensorBoard | Curvas para informe académico |
-| Inferencia | ONNX Runtime en Lambda | ~50 MB vs ~800 MB de PyTorch |
-| Frontend | HTML/CSS/JS estático | GitHub Pages sin backend propio |
+| Capa | Tecnología |
+|------|------------|
+| Entrenamiento | PyTorch Lightning 2.x |
+| Modelo | EfficientNet-B0 (pesos ImageNet) + cabeza 38 clases |
+| Métricas | `train_loss`, `val_loss`, `train_acc`, `val_acc` |
+| Inferencia | ONNX Runtime Web (WASM) |
+| Frontend | HTML / CSS / JS estático |
+
+**Por qué EfficientNet-B0 y no ResNet-50:** menor tamaño y latencia para ONNX en navegador, con buen rendimiento en PlantVillage; ResNet-50 es alternativa válida si la inferencia es solo en servidor.
+
+---
 
 ## Dataset
 
-- **Kaggle:** [New Plant Diseases Dataset](https://www.kaggle.com/datasets/vipoooool/new-plant-diseases-dataset) (~87k imágenes, `train/` + `valid/`)
-- **Alternativa (EDA / export):** [plantvillage-full en Hugging Face](https://huggingface.co/datasets/geraldmc/plantvillage-full) — mismas **38 clases**
+- **Kaggle:** [New Plant Diseases Dataset](https://www.kaggle.com/datasets/vipoooool/new-plant-diseases-dataset)
+- **Hugging Face:** [plantvillage-full](https://huggingface.co/datasets/geraldmc/plantvillage-full) (mismas 38 clases; usado en el entrenamiento de la demo)
 
-### Resumen EDA (ejecutado en el repo)
-
-| Métrica | Valor |
-|---------|-------|
+| Métrica (EDA) | Valor |
+|---------------|-------|
 | Clases | 38 |
 | Train | 43,356 |
 | Valid | 10,948 |
 | Desbalance max/min | ~36× |
 
-Ver notebook con outputs: [`notebooks/01_EDA_executed.ipynb`](notebooks/01_EDA_executed.ipynb).
+Notebook con figuras: [`notebooks/01_EDA_executed.ipynb`](notebooks/01_EDA_executed.ipynb).
+
+---
+
+## Modelo entrenado y resultados
+
+### Arquitectura y entrenamiento
+
+| Aspecto | Detalle |
+|---------|---------|
+| Red | **EfficientNet-B0** + `Dropout(0.3)` + `Linear(1280 → 38)` |
+| Preentrenamiento | ImageNet (`IMAGENET1K_V1`) |
+| Aprendizaje | Transfer learning: 2 épocas backbone congelado → fine-tune completo |
+| Optimizador | AdamW (cabeza `1e-3`, backbone `1e-4`) |
+| Pérdida | Cross-entropy |
+| Entrada | 224×224, normalización ImageNet |
+| Mejor checkpoint | `efficientnet-epoch=08-val_acc=0.9628.ckpt` |
+| Entorno | Lightning Studio, GPU NVIDIA L4 |
+| Modo | `--fast` (50 img/clase en train, hasta 10 épocas) |
+
+### Métricas
+
+| Métrica | Significado |
+|---------|-------------|
+| **`val_acc`** | % de imágenes de **valid** donde la clase predicha coincide con la etiqueta. Es la métrica para guardar el mejor modelo. |
+| **`val_loss`** | Error de clasificación en valid; debe bajar junto con `val_acc`. |
+| **`train_acc` / `train_loss`** | Mismo criterio en entrenamiento; si train mejora mucho y valid no, hay sobreajuste. |
+
+### Resultado principal
+
+**`val_acc ≈ 96,3 %`** en el split de validación de PlantVillage (entrenamiento rápido con submuestreo).
+
+- **Sí indica:** buen desempeño en fotos similares al dataset (14 cultivos, 38 estados, fondo tipo laboratorio).
+- **No indica:** 96 % en cualquier hoja del mundo ni en condiciones de campo sin medir.
+
+### Salida de la app
+
+1. Diagnóstico principal (clase con mayor probabilidad softmax).
+2. Confianza (% de esa probabilidad).
+3. Top 3 alternativas.
+4. Recomendación de manejo (`webapp/models/treatments.json`), omitida si el resultado parece poco confiable.
+
+El modelo **siempre** elige una de las 38 clases; no hay etiqueta “desconocido”.
+
+---
+
+## Limitaciones de uso
+
+### 14 cultivos, 38 clases
+
+| Cultivo | Estados en el modelo |
+|---------|----------------------|
+| Manzana | Sarna, podredumbre negra, roya del cedro, sano |
+| Arándano | Sano |
+| Cereza | Oídio, sano |
+| Maíz | Manchas, roya, tizón, sano |
+| Uva | Podredumbre, esca, mancha foliar, sano |
+| Naranja | Huanglongbing |
+| Durazno | Mancha bacteriana, sano |
+| Pimiento | Mancha bacteriana, sano |
+| Papa | Tizón temprano/tardío, sano |
+| Frambuesa / soja | Sano |
+| Calabaza | Oídio |
+| Fresa | Quemadura foliar, sano |
+| Tomate | 9 enfermedades + sano |
+
+No incluye mango, café, plátano, aguacate y muchos otros cultivos.
+
+### Hojas fuera del dataset
+
+El sistema asigna la clase **más parecida** entre 38. Puede fallar con confianza alta. La web avisa si confianza **&lt; 60 %** o si el top 3 mezcla cultivos distintos.
+
+Traducciones: [`src/labels.py`](src/labels.py).
+
+---
 
 ## Estructura del proyecto
 
 ```
 plant-disease-detector/
-├── src/
-│   ├── datamodule.py      # LightningDataModule + augmentations
-│   ├── model.py           # EfficientNet + freeze / fine-tune
-│   ├── train.py           # CLI de entrenamiento
-│   └── export_onnx.py     # Export para Lambda
-├── notebooks/
-│   ├── 01_EDA.ipynb
-│   └── eda_outputs/       # Figuras del informe
-├── lambda/                # Handler AWS (Docker + ONNX)
-├── webapp/                # UI para GitHub Pages
-├── scripts/               # API local, upload Lightning, download HF
-└── infra/                 # Deploy AWS (esqueleto)
+├── src/                 # datamodule, model, train, export_onnx, labels, treatments
+├── notebooks/           # EDA y figuras en eda_outputs/
+├── webapp/              # Demo GitHub Pages + models/model.onnx
+├── scripts/             # Descarga HF, API local, utilidades Lightning
+├── lambda/              # Handler AWS opcional
+└── infra/               # Scripts de despliegue AWS
 ```
 
-El código en `src/` está **comentado en español** (bloques explicando qué hace Lightning y por qué).
+---
 
 ## Entrenamiento
 
-### 1. Entorno
+### Entorno local
 
 ```bash
 git clone https://github.com/danielrpo1/plant-disease-detector.git
@@ -227,94 +218,78 @@ python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Datos
-
-**Opción A — Kaggle:** descarga y apunta a la carpeta con `train/` y `valid/`.
-
-**Opción B — Hugging Face:**
+### Datos
 
 ```bash
+# Hugging Face (recomendado)
 python scripts/download_dataset_hf.py --out data/plantvillage
-# Prueba rápida: --max-per-class 100
+
+# O Kaggle: carpeta con train/ y valid/
 ```
 
-### 3. Entrenar
+### Entrenar y exportar
 
 ```bash
-# Modo rápido (~1–2 h GPU): 50 img/clase, 10 épocas
+# Subconjunto rápido (demo)
 python -m src.train --data_dir data/plantvillage --fast
 
-# Modo completo
+# Dataset completo
 python -m src.train --data_dir data/plantvillage --epochs 15
-```
 
-### 4. Exportar ONNX
-
-```bash
 python -m src.export_onnx \
   --checkpoint checkpoints/efficientnet-*.ckpt \
   --class_mapping checkpoints/class_mapping.json \
-  --output artifacts/model.onnx
+  --output webapp/models/model.onnx
 ```
 
-### Lightning AI Studio
+**Lightning Studio:** credenciales en `.env` (ver `.env.example`), subida con `scripts/upload_to_lightning.py`, guía en [`notebooks/LIGHTNING_STUDIO.md`](notebooks/LIGHTNING_STUDIO.md).
 
-```bash
-cp .env.example .env   # LIGHTNING_USER_ID + LIGHTNING_API_KEY
-./scripts/lightning_login.sh
-# Sube el repo al Studio y entrena (ver notebooks/LIGHTNING_STUDIO.md)
-```
+---
 
 ## Despliegue
 
-### Plan A — AWS (producción)
+### Web (producción actual)
 
-1. Sube `artifacts/model.onnx` + `model.meta.json` a **S3**.
-2. Build imagen Docker en `lambda/` y despliega en **Lambda**.
-3. Crea **API Gateway** (POST, CORS abierto para demo).
-4. Pon la URL en `webapp/config.js` y publica **GitHub Pages**.
+El workflow [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) publica `webapp/` en GitHub Pages. El modelo ONNX viaja en el repo; la inferencia es local en el navegador.
 
-Detalle: [`infra/deploy.sh`](infra/deploy.sh) y [`PLAN_1_DIA.md`](PLAN_1_DIA.md).
-
-### Plan B — Demo local (sin AWS)
+### API local (desarrollo)
 
 ```bash
 pip install flask
 python scripts/local_api.py \
-  --onnx artifacts/model.onnx \
-  --meta artifacts/model.meta.json
+  --onnx webapp/models/model.onnx \
+  --meta webapp/models/model.meta.json
 ```
 
 En `webapp/config.js`: `window.API_URL = "http://127.0.0.1:8000/predict"`.
 
-## Roadmap
+### AWS (opcional)
 
-| Paso | Estado | Entregable |
-|------|--------|------------|
-| 1. EDA | ✅ | [`01_EDA_executed.ipynb`](notebooks/01_EDA_executed.ipynb) |
-| 2. Entrenar EfficientNet | ✅ | val_acc ≈ **96.3%** (`--fast`, 50 img/clase) |
-| 3. Export ONNX | ✅ | `webapp/models/model.onnx` (16 MB) |
-| 4. Inferencia en web | ✅ | ONNX en el navegador (sin AWS) |
-| 5. GitHub Pages | ✅ | [danielrpo1.github.io/plant-disease-detector](https://danielrpo1.github.io/plant-disease-detector/) |
-| 6. Informe / slides | ⏳ | Pipeline end-to-end |
+Docker en `lambda/`, modelo en S3, API Gateway. Ver [`infra/deploy.sh`](infra/deploy.sh).
 
-## Qué sigue después del EDA
+---
 
-Ver guía detallada: [`DESPUES_DEL_EDA.md`](DESPUES_DEL_EDA.md).
+## Estado del proyecto
 
-Resumen en 4 pasos:
+| Componente | Estado |
+|------------|--------|
+| EDA | ✅ [`01_EDA_executed.ipynb`](notebooks/01_EDA_executed.ipynb) |
+| Entrenamiento EfficientNet-B0 | ✅ val_acc ≈ 96,3 % (`--fast`) |
+| Export ONNX + web | ✅ [Demo en vivo](https://danielrpo1.github.io/plant-disease-detector/) |
+| Tratamientos y avisos OOD en UI | ✅ |
+| Entrenamiento full (~87k) | Pendiente |
+| AWS Lambda en producción | Opcional |
+| Informe / slides | En curso |
 
-1. **Entrenar** en Lightning Studio → `python -m src.train --data_dir ... --fast`
-2. **Exportar** → `python -m src.export_onnx --checkpoint ...`
-3. **API** → Lambda + API Gateway *o* `scripts/local_api.py` para la demo
-4. **Conectar la web** → pegar la URL de la API en `webapp/config.js` (la Pages ya está publicada)
+---
 
 ## Licencia
 
-MIT — uso académico y educativo. El dataset tiene sus propias licencias en Kaggle / Hugging Face.
+MIT — uso académico y educativo. El dataset tiene licencias propias en Kaggle / Hugging Face.
 
 ## Referencias
 
 - [PlantVillage (Mohanty et al., 2016)](https://www.plantvillage.org/)
-- [PyTorch Lightning Docs](https://lightning.ai/docs/pytorch/stable/)
+- [PyTorch Lightning](https://lightning.ai/docs/pytorch/stable/)
 - [ONNX Runtime](https://onnxruntime.ai/)
+- [EfficientNet (Tan & Le, 2019)](https://arxiv.org/abs/1905.11946)

@@ -63,3 +63,48 @@ h1 { margin-top: 0; font-size: 1.5rem; }
   color: #666;
   line-height: 1.35;
 }
+.info-box {
+  margin: 1rem 0;
+  padding: 0.85rem 1rem;
+  background: #fff8e6;
+  border: 1px solid #e9c46a;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+.info-box p { margin: 0 0 0.5rem; }
+.crops-details { margin-top: 0.35rem; }
+.crops-details summary {
+  cursor: pointer;
+  color: #1b4332;
+  font-weight: 600;
+}
+.crops-list {
+  margin: 0.5rem 0 0;
+  padding-left: 1.2rem;
+  font-size: 0.85rem;
+}
+.info-foot {
+  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+  color: #666;
+}
+.warn-box {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  background: #fde8e8;
+  border-left: 4px solid #c1121f;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+.warn-box h3 {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  color: #9d0208;
+}
+.warn-box ul { margin: 0; padding-left: 1.2rem; }
+.treatment-muted {
+  font-size: 0.85rem;
+  color: #666;
+  font-style: italic;
+}

@@ -9,8 +9,31 @@
 <body>
   <main class="container">
     <h1>Diagnóstico de hojas</h1>
-    <p class="subtitle">Sube una foto y obtén el diagnóstico (EAFIT · <a href="https://github.com/danielrpo1/plant-disease-detector">código</a>)</p>
+    <p class="subtitle">Sube una foto y obtén el diagnóstico (EAFIT · <a href="https://github.com/danielrpo1/plant-disease-detector#modelo-entrenado-y-resultados">modelo y límites</a>)</p>
     <p id="apiHint" class="subtitle hidden"></p>
+
+    <aside class="info-box" aria-label="Alcance del modelo">
+      <p><strong>Solo reconoce 14 cultivos</strong> (manzana, tomate, papa, maíz, uva, etc.). Si la hoja es de otra planta, el sistema puede equivocarse aunque muestre porcentaje alto.</p>
+      <details class="crops-details">
+        <summary>Ver cultivos y enfermedades incluidas (38 clases)</summary>
+        <ul class="crops-list">
+          <li><strong>Manzana:</strong> sarna, podredumbre negra, roya del cedro, sano</li>
+          <li><strong>Arándano:</strong> sano</li>
+          <li><strong>Cereza:</strong> oídio, sano</li>
+          <li><strong>Maíz:</strong> manchas, roya, tizón, sano</li>
+          <li><strong>Uva:</strong> podredumbre, esca, mancha foliar, sano</li>
+          <li><strong>Naranja:</strong> huanglongbing</li>
+          <li><strong>Durazno:</strong> mancha bacteriana, sano</li>
+          <li><strong>Pimiento:</strong> mancha bacteriana, sano</li>
+          <li><strong>Papa:</strong> tizón temprano/tardío, sano</li>
+          <li><strong>Frambuesa / soja:</strong> sano</li>
+          <li><strong>Calabaza:</strong> oídio</li>
+          <li><strong>Fresa:</strong> quemadura foliar, sano</li>
+          <li><strong>Tomate:</strong> 9 enfermedades + sano</li>
+        </ul>
+        <p class="info-foot">Modelo: EfficientNet-B0 · ~96 % en validación PlantVillage (entrenamiento rápido). No sustituye diagnóstico de campo.</p>
+      </details>
+    </aside>
 
     <label class="upload">
       <input type="file" id="fileInput" accept="image/*" />

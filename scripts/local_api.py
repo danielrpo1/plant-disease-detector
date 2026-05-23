@@ -1,8 +1,8 @@
 """
-API local para demo sin AWS (Plan B del día 1).
+API local para desarrollo y pruebas sin AWS.
 
   pip install flask
-  python scripts/local_api.py --onnx artifacts/model.onnx --meta artifacts/model.meta.json
+  python scripts/local_api.py --onnx webapp/models/model.onnx --meta webapp/models/model.meta.json
 
 Webapp: en config.js → window.API_URL = "http://127.0.0.1:8000/predict"
 """
