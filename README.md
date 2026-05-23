@@ -13,11 +13,10 @@
 </p>
 
 <p align="center">
-  <a href="#demo">Demo</a> ·
+  <a href="https://danielrpo1.github.io/plant-disease-detector/">Web demo</a> ·
+  <a href="#roadmap">Qué sigue</a> ·
   <a href="#arquitectura">Arquitectura</a> ·
-  <a href="#dataset">Dataset</a> ·
   <a href="#entrenamiento">Entrenar</a> ·
-  <a href="#despliegue">Desplegar</a> ·
   <a href="notebooks/01_EDA_executed.ipynb">EDA</a>
 </p>
 
@@ -180,12 +179,25 @@ En `webapp/config.js`: `window.API_URL = "http://127.0.0.1:8000/predict"`.
 
 ## Roadmap
 
-- [x] EDA + código Lightning comentado
-- [x] Export ONNX + handler Lambda
-- [x] Webapp estática
-- [ ] Entrenamiento full 87k + métricas en W&B
-- [ ] CI/CD GitHub Actions → AWS
-- [ ] GitHub Pages en producción
+| Paso | Estado | Entregable |
+|------|--------|------------|
+| 1. EDA | ✅ | [`01_EDA_executed.ipynb`](notebooks/01_EDA_executed.ipynb) |
+| 2. Entrenar EfficientNet | ⏳ | `checkpoints/*.ckpt` + curvas W&B |
+| 3. Export ONNX | ⏳ | `artifacts/model.onnx` |
+| 4. API (Lambda o local) | ⏳ | URL en `webapp/config.js` |
+| 5. GitHub Pages | ✅ | [danielrpo1.github.io/plant-disease-detector](https://danielrpo1.github.io/plant-disease-detector/) |
+| 6. Informe / slides | ⏳ | Pipeline end-to-end |
+
+## Qué sigue después del EDA
+
+Ver guía detallada: [`DESPUES_DEL_EDA.md`](DESPUES_DEL_EDA.md).
+
+Resumen en 4 pasos:
+
+1. **Entrenar** en Lightning Studio → `python -m src.train --data_dir ... --fast`
+2. **Exportar** → `python -m src.export_onnx --checkpoint ...`
+3. **API** → Lambda + API Gateway *o* `scripts/local_api.py` para la demo
+4. **Conectar la web** → pegar la URL de la API en `webapp/config.js` (la Pages ya está publicada)
 
 ## Autor
 

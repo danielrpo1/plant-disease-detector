@@ -1,3 +1,10 @@
+const apiHint = document.getElementById("apiHint");
+if (!window.API_URL || window.API_URL.includes("PASTE_")) {
+  apiHint.textContent =
+    "Vista previa: conecta la API en webapp/config.js después del entrenamiento.";
+  apiHint.classList.remove("hidden");
+}
+
 const fileInput = document.getElementById("fileInput");
 const btnPredict = document.getElementById("btnPredict");
 const preview = document.getElementById("preview");
