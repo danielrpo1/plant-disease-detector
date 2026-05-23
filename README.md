@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://danielrpo1.github.io/plant-disease-detector/"><strong>Web demo</strong></a> ·
+  <a href="https://danielrpo1.github.io/plant-disease-detector/app/"><strong>Web demo</strong></a> ·
   <a href="#modelo-entrenado-y-resultados">Modelo y resultados</a> ·
   <a href="#limitaciones-de-uso">Limitaciones</a> ·
   <a href="#arquitectura">Arquitectura</a> ·
@@ -41,7 +41,8 @@ Identificar **enfermedades en cultivos** a partir de fotos de hojas. El sistema 
 
 ## Demo
 
-**URL:** [danielrpo1.github.io/plant-disease-detector](https://danielrpo1.github.io/plant-disease-detector/)
+**Documentación (GitHub Pages):** [danielrpo1.github.io/plant-disease-detector](https://danielrpo1.github.io/plant-disease-detector/)  
+**Demo interactiva:** […/plant-disease-detector/app](https://danielrpo1.github.io/plant-disease-detector/app/)
 
 | Distribución de clases (EDA) | Muestras del dataset |
 |:---:|:---:|
@@ -71,7 +72,7 @@ flowchart LR
 | Datos | Kaggle o Hugging Face | ~87k imágenes PlantVillage, 38 clases (`train/` + `valid/`) |
 | Entrenamiento | Lightning AI Studio (GPU) | EfficientNet-B0, checkpoints, métricas |
 | Artefacto | Repo `webapp/models/` | `model.onnx` (~16 MB) + metadatos de clases |
-| Producción | GitHub Pages | La demo corre el modelo **en el cliente**; no requiere AWS |
+| Producción | GitHub Pages | Home = este README; demo en `/app/` (ONNX en el navegador) |
 | Opcional | `lambda/` + API Gateway | Misma red en ONNX vía servidor (ver [Despliegue](#despliegue)) |
 
 ---
@@ -250,7 +251,7 @@ python -m src.export_onnx \
 
 ### Web (producción actual)
 
-El workflow [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) publica `webapp/` en GitHub Pages. El modelo ONNX viaja en el repo; la inferencia es local en el navegador.
+El workflow [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) genera el sitio con `scripts/build_github_pages.py`: la **raíz** muestra este README; la **demo** vive en `/app/`. El modelo ONNX viaja en el repo; la inferencia es local en el navegador.
 
 ### API local (desarrollo)
 
@@ -275,7 +276,7 @@ Docker en `lambda/`, modelo en S3, API Gateway. Ver [`infra/deploy.sh`](infra/de
 |------------|--------|
 | EDA | ✅ [`01_EDA_executed.ipynb`](notebooks/01_EDA_executed.ipynb) |
 | Entrenamiento EfficientNet-B0 | ✅ val_acc ≈ 96,3 % (`--fast`) |
-| Export ONNX + web | ✅ [Demo en vivo](https://danielrpo1.github.io/plant-disease-detector/) |
+| Export ONNX + web | ✅ [Docs](https://danielrpo1.github.io/plant-disease-detector/) · [Demo](https://danielrpo1.github.io/plant-disease-detector/app/) |
 | Tratamientos y avisos OOD en UI | ✅ |
 | Entrenamiento full (~87k) | Pendiente |
 | AWS Lambda en producción | Opcional |

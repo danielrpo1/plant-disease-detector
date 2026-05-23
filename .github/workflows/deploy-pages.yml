@@ -1,4 +1,4 @@
-# Publica webapp/ en GitHub Pages en cada push a main
+# Home = README renderizado; demo ONNX en /app/
 name: Deploy GitHub Pages
 
 on:
@@ -24,13 +24,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Construir sitio (README + demo)
+        run: |
+          pip install markdown
+          python scripts/build_github_pages.py
+
       - name: Configurar Pages
         uses: actions/configure-pages@v5
 
-      - name: Subir webapp
+      - name: Subir artefacto
         uses: actions/upload-pages-artifact@v3
         with:
-          path: webapp
+          path: _site
 
       - name: Desplegar
         id: deployment

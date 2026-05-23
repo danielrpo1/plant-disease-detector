@@ -36,3 +36,6 @@ lightning_logs/
 # AWS local
 .aws-sam/
 package/
+
+# Build GitHub Pages (generado en CI)
+_site/
